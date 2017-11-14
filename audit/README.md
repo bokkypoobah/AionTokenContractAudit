@@ -16,7 +16,7 @@ This audit has been conducted on Nuco's source code in commit
 [c3e7469](https://github.com/gonuco/aion.erc.contract/commit/c3e7469bacfa60e0acf0328adb5246e88c5ed94f),
 [a0c0042](https://github.com/gonuco/aion.erc.contract/commit/a0c0042651a88919ed948f73cb6f2976bf9015f2),
 [b671849](https://github.com/gonuco/aion.erc.contract/commit/b671849624602cbde70dd6e6c5ca022ba7fdfee1),
-[a93b81d](https://github.com/gonuco/aion.erc.contract/commit/a93b81d63ee986d5830a60e7640809ed3d09d213) and
+[a93b81d](https://github.com/gonuco/aion.erc.contract/commit/a93b81d63ee986d5830a60e7640809ed3d09d213),
 [eefdc59](https://github.com/gonuco/aion.erc.contract/commit/eefdc596d2812272b05b144bb163f69fcb42aeca).
 
 Note that the crowdsale contract will collect funds but will not issue tokens immediately. Nuco has an application
@@ -29,6 +29,14 @@ Note that the savings contract has a `nullify()` function that will freeze most 
 that have been deposited into the savings contract. The developer stated that Nuco would compensate token holders with locked tokens in 
 the savings contracts through some other means as the withdrawal logic could be compromised in situations where the last resort `nullify()`
 function needs to be executed.
+
+<br />
+
+### Update Nov 14 2017
+
+The new commit [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) contains changes related
+to the trs module.
+
 
 <br />
 
@@ -570,6 +578,21 @@ Files from [../trs/contracts](../trs/contracts):
 * [x] [code-review-trs/Savings.md](code-review-trs/Savings.md)
   * [x] contract Token 
   * [x] contract Savings 
+
+<br />
+
+### Update Nov 14 2017
+
+The new commit [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) contains changes related
+to the trs module.
+
+Files from [../standard/contracts](../standard/contracts):
+
+* [x] [code-review-standard/Administrator.md](code-review-standard/Administrator.md)
+  * [x] contract Administrator is Owned
+* [x] [code-review-standard/Owned.md](code-review-standard/Owned.md)
+  * [x] contract Owned
+  * [x] contract IOwned
 
 <br />
 
