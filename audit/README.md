@@ -17,7 +17,8 @@ This audit has been conducted on Nuco's source code in commit
 [a0c0042](https://github.com/gonuco/aion.erc.contract/commit/a0c0042651a88919ed948f73cb6f2976bf9015f2),
 [b671849](https://github.com/gonuco/aion.erc.contract/commit/b671849624602cbde70dd6e6c5ca022ba7fdfee1),
 [a93b81d](https://github.com/gonuco/aion.erc.contract/commit/a93b81d63ee986d5830a60e7640809ed3d09d213),
-[eefdc59](https://github.com/gonuco/aion.erc.contract/commit/eefdc596d2812272b05b144bb163f69fcb42aeca).
+[eefdc59](https://github.com/gonuco/aion.erc.contract/commit/eefdc596d2812272b05b144bb163f69fcb42aeca) and
+[69ed73c](https://github.com/gonuco/aion.erc.contract/commit/69ed73c72eb9acafd74575061861fc0215d49832).
 
 Note that the crowdsale contract will collect funds but will not issue tokens immediately. Nuco has an application
 that will collect the crowdsale contract contribution events and will use this to generate the token balances in
@@ -32,9 +33,10 @@ function needs to be executed.
 
 <br />
 
-### Update Nov 14 2017
+### Update Nov 17 2017
 
-The new commit [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) contains changes related
+The new commits [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) and
+[69ed73c](https://github.com/gonuco/aion.erc.contract/commit/69ed73c72eb9acafd74575061861fc0215d49832) contains changes related
 to the trs module.
 
 
@@ -581,9 +583,11 @@ Files from [../trs/contracts](../trs/contracts):
 
 <br />
 
-### Update Nov 14 2017
+### Update Nov 17 2017
 
-The new commit [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) contains changes related
+
+The new commits [9e63759](https://github.com/gonuco/aion.erc.contract/commit/9e63759d4e32e23fc218c6fb196e37d65db60f12) and
+[69ed73c](https://github.com/gonuco/aion.erc.contract/commit/69ed73c72eb9acafd74575061861fc0215d49832) contains changes related
 to the trs module.
 
 Files from [../standard/contracts](../standard/contracts):
@@ -621,4 +625,4 @@ Files from [../trs/contracts](../trs/contracts):
 
 <br />
 
-(c) BokkyPooBah / Bok Consulting Pty Ltd for Cindicator - Oct 06 2017. The MIT Licence.
+(c) BokkyPooBah / Bok Consulting Pty Ltd for Nuco - Oct 20 2017. The MIT Licence.

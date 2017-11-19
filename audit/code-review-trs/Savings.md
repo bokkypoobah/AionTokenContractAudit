@@ -21,6 +21,8 @@ contract Token {
 	function balanceOf(address addr) constant returns(uint);
 }
 
+// BK Ok
+import {Owned} from '../../standard/contracts/Owned.sol';
 
 /**
  * Savings is a contract that releases Tokens on a predefined
@@ -45,11 +47,10 @@ contract Token {
  * bonus tokens that are distributed.
  */
 // BK Ok
-contract Savings {
+contract Savings is Owned {
 	/**
 	 * Periods is the total monthly withdrawable amount, not counting the
-	 * special withdrawal. Periods MUST be divisible by 3, as
-	 * t0special = periods / 3.
+	 * special withdrawal.
 	 */
 	// BK Ok
 	uint public periods;
@@ -79,11 +80,6 @@ contract Savings {
 	event Deposit(address indexed who, uint amount);
 
     // BK Ok
-	address public owner;
-	// BK Ok
-	address public newOwner;
-
-    // BK Ok
 	bool public inited;
     // BK Ok
 	bool public locked;
@@ -101,7 +97,14 @@ contract Savings {
 	// BK Ok
 	uint public totalfv;
 
-	// total tokens owned by the contract after locking
+	// the total remaining value
+	// BK Ok
+	uint public remainder;
+
+	/**
+	 * Total tokens owned by the contract after locking, and possibly
+	 * updated by the foundation after subsequent sales.
+	 */
 	// BK Ok
 	uint public total;
 
@@ -112,17 +115,8 @@ contract Savings {
 	// BK Ok
 	bool public nullified;
 
-    // BK Ok - Constructor
-	function Savings() {
-	    // BK Ok
-		owner = msg.sender;
-	}
-
     // BK Ok
 	modifier notNullified() { require(!nullified); _; }
-
-    // BK Ok
-	modifier onlyOwner() { require(msg.sender == owner); _; }
 
     // BK Ok - Before lock and not started
 	modifier preLock() { require(!locked && startBlockTimestamp == 0); _; }
@@ -162,6 +156,16 @@ contract Savings {
 	modifier initialized() { require(inited); _; }
 
 	/**
+	 * Revert under all conditions for fallback, cheaper mistakes
+	 * in the future?
+	 */
+	// BK Ok
+	function() {
+	    // BK Ok
+		revert();
+	}
+
+	/**
 	 * Nullify functionality is intended to disable the contract.
 	 */
 	// BK NOTE - This function will disable all withdrawals and cannot be undone
@@ -180,33 +184,19 @@ contract Savings {
 	 * init is called for the first time.
 	 */
 	// BK Ok - Only owner can execute once at the start
-	function init(uint _periods) onlyOwner notInitialized {
+	function init(uint _periods, uint _t0special) onlyOwner notInitialized {
 	    // BK Ok
-		require(_periods != 0 && (_periods % 3) == 0);
+		require(_periods != 0);
 		// BK Ok
 		periods = _periods;
 		// BK Ok
-		t0special = _periods / 3;
+		t0special = _t0special;
 	}
 
     // BK Ok - Only owner can execute once at the start
 	function finalizeInit() onlyOwner notInitialized {
 	    // BK Ok
 		inited = true;
-	}
-
-    // BK Ok - Only owner can execute
-	function changeOwner(address addr) onlyOwner {
-	    // BK Ok
-		newOwner = addr;
-	}
-
-    // BK Ok - Only newOwner can execute
-	function acceptOwnership() {
-	    // BK Ok
-		require(msg.sender == newOwner);
-		// BK Ok
-		owner = newOwner;
 	}
 
     // BK Ok - Only owner can execute
@@ -235,7 +225,9 @@ contract Savings {
 	    // BK Ok
 		startBlockTimestamp = _startBlockTimestamp;
 		// BK Ok
-		total = token.balanceOf(this);
+		uint256 tokenBalance = token.balanceOf(this);
+		total = tokenBalance;
+		remainder = tokenBalance;
 	}
 
 	/**
@@ -256,19 +248,32 @@ contract Savings {
 	 * contract, only available before contract is locked
 	 */
 	// BK Ok - Only owner can execute, before contract locked
-	function sendTokens(address addr, uint amount) onlyOwner preLock {
+	function refundTokens(address addr, uint amount) onlyOwner preLock {
 	    // BK Ok
 		token.transfer(addr, amount);
 	}
 
+
 	/**
-	 * Revert under all conditions for fallback, cheaper mistakes
-	 * in the future?
+	 * Update the total balance, to be called in case of subsequent sales. Updates
+	 * the total recorded balance of the contract by the difference in expected
+	 * remainder and the current balance. This means any positive difference will
+	 * be "recorded" into the contract, and distributed within the remaining
+	 * months of the TRS.
 	 */
-	// BK Ok
-	function() {
+	// BK Ok - Only owner can execute, after contract locked
+	function updateTotal() onlyOwner postLock {
 	    // BK Ok
-		revert();
+		uint current = token.balanceOf(this);
+		// BK Ok
+		require(current >= remainder); // for sanity
+
+        // BK Ok
+		uint difference = (current - remainder);
+		// BK Ok
+		total += difference;
+		// BK Ok
+		remainder = current;
 	}
 
 	/**
@@ -322,15 +327,15 @@ contract Savings {
 	//
 	// the despositor must have approve()'d the tokens
 	// to be transferred by this contract
-	// BK Ok
-	function deposit(uint tokens) notNullified {
+	// BK Ok - Only owner can execute
+	function deposit(uint tokens) onlyOwner notNullified {
 	    // BK Ok
 		depositTo(msg.sender, tokens);
 	}
 
 
-    // BK Ok
-	function depositTo(address beneficiary, uint tokens) preLock notNullified {
+    // BK Ok - Only owner can execute
+	function depositTo(address beneficiary, uint tokens) onlyOwner preLock notNullified {
 	    // BK Ok
 		require(token.transferFrom(msg.sender, this, tokens));
 		// BK Ok
@@ -391,7 +396,7 @@ contract Savings {
 	 * that the correct state is given (isStart() == true)
 	 */
 	// BK Ok - Constant function
-	function _withdrawTo(uint _deposit, uint _withdrawn, uint _blockTimestamp) constant returns (uint) {
+	function _withdrawTo(uint _deposit, uint _withdrawn, uint _blockTimestamp, uint _total) constant returns (uint) {
 	    // BK Ok
 		uint256 fraction = availableForWithdrawalAt(_blockTimestamp);
 
@@ -413,7 +418,7 @@ contract Savings {
 		 * The maximum for a uint256 is = 1.15 * (10 ** 77)
 		 */
 		// BK Ok
-		uint256 withdrawable = ((_deposit * fraction * total) / totalfv) / precision;
+		uint256 withdrawable = ((_deposit * fraction * _total) / totalfv) / precision;
 
 		// check that we can withdraw something
         // BK Ok
@@ -437,7 +442,7 @@ contract Savings {
 		uint _w = withdrawn[addr];
 
         // BK Ok
-		uint diff = _withdrawTo(_d, _w, block.timestamp);
+		uint diff = _withdrawTo(_d, _w, block.timestamp, total);
 
 		// no withdrawal could be made
         // BK Ok
@@ -456,7 +461,7 @@ contract Savings {
 
         // BK Ok
 		withdrawn[addr] += diff;
-		
+		remainder -= diff;
         // BK Ok - Log event
 		Withdraws(addr, diff);
         // BK Ok

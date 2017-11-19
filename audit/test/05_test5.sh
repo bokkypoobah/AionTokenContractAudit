@@ -13,6 +13,7 @@ PASSWORD=`grep ^PASSWORD= settings.txt | sed "s/^.*=//"`
 TOKENCONTRACTSDIR=`grep ^TOKENCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 SALESCONTRACTSDIR=`grep ^SALESCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 TRSCONTRACTSDIR=`grep ^TRSCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
+STANDARDCONTRACTSDIR=`grep ^STANDARDCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 
 # --- Tokens ---
 CONTROLLERSOL=`grep ^CONTROLLERSOL= settings.txt | sed "s/^.*=//"`
@@ -54,34 +55,35 @@ STARTTIME_S=`date -r $STARTTIME -u`
 ENDTIME=`echo "$CURRENTTIME+60*5" | bc`
 ENDTIME_S=`date -r $ENDTIME -u`
 
-printf "MODE              = '$MODE'\n" | tee $TEST5OUTPUT
-printf "GETHATTACHPOINT   = '$GETHATTACHPOINT'\n" | tee -a $TEST5OUTPUT
-printf "PASSWORD          = '$PASSWORD'\n" | tee -a $TEST5OUTPUT
-printf "TOKENCONTRACTSDIR = '$TOKENCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
-printf "SALESCONTRACTSDIR = '$SALESCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
-printf "TRSCONTRACTSDIR   = '$TRSCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
+printf "MODE                 = '$MODE'\n" | tee $TEST5OUTPUT
+printf "GETHATTACHPOINT      = '$GETHATTACHPOINT'\n" | tee -a $TEST5OUTPUT
+printf "PASSWORD             = '$PASSWORD'\n" | tee -a $TEST5OUTPUT
+printf "TOKENCONTRACTSDIR    = '$TOKENCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
+printf "SALESCONTRACTSDIR    = '$SALESCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
+printf "TRSCONTRACTSDIR      = '$TRSCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
+printf "STANDARDCONTRACTSDIR = '$STANDARDCONTRACTSDIR'\n" | tee -a $TEST5OUTPUT
 printf "\--- Token --- \n" | tee -a $TEST5OUTPUT
-printf "CONTROLLERSOL     = '$CONTROLLERSOL'\n" | tee -a $TEST5OUTPUT
-printf "CONTROLLERJS      = '$CONTROLLERJS'\n" | tee -a $TEST5OUTPUT
-printf "LEDGERSOL         = '$LEDGERSOL'\n" | tee -a $TEST5OUTPUT
-printf "LEDGERJS          = '$LEDGERJS'\n" | tee -a $TEST5OUTPUT
-printf "TOKENSOL          = '$TOKENSOL'\n" | tee -a $TEST5OUTPUT
-printf "TOKENJS           = '$TOKENJS'\n" | tee -a $TEST5OUTPUT
+printf "CONTROLLERSOL        = '$CONTROLLERSOL'\n" | tee -a $TEST5OUTPUT
+printf "CONTROLLERJS         = '$CONTROLLERJS'\n" | tee -a $TEST5OUTPUT
+printf "LEDGERSOL            = '$LEDGERSOL'\n" | tee -a $TEST5OUTPUT
+printf "LEDGERJS             = '$LEDGERJS'\n" | tee -a $TEST5OUTPUT
+printf "TOKENSOL             = '$TOKENSOL'\n" | tee -a $TEST5OUTPUT
+printf "TOKENJS              = '$TOKENJS'\n" | tee -a $TEST5OUTPUT
 printf "\--- Sales --- \n" | tee -a $TEST5OUTPUT
-printf "RECEIVERSOL       = '$RECEIVERSOL'\n" | tee -a $TEST5OUTPUT
-printf "RECEIVERJS        = '$RECEIVERJS'\n" | tee -a $TEST5OUTPUT
-printf "SALESOL           = '$SALESOL'\n" | tee -a $TEST5OUTPUT
-printf "SALEJS            = '$SALEJS'\n" | tee -a $TEST5OUTPUT
+printf "RECEIVERSOL          = '$RECEIVERSOL'\n" | tee -a $TEST5OUTPUT
+printf "RECEIVERJS           = '$RECEIVERJS'\n" | tee -a $TEST5OUTPUT
+printf "SALESOL              = '$SALESOL'\n" | tee -a $TEST5OUTPUT
+printf "SALEJS               = '$SALEJS'\n" | tee -a $TEST5OUTPUT
 printf "\--- Trs --- \n" | tee -a $TEST5OUTPUT
-printf "SAVINGSSOL        = '$SAVINGSSOL'\n" | tee -a $TEST5OUTPUT
-printf "SAVINGSJS         = '$SAVINGSJS'\n" | tee -a $TEST5OUTPUT
+printf "SAVINGSSOL           = '$SAVINGSSOL'\n" | tee -a $TEST5OUTPUT
+printf "SAVINGSJS            = '$SAVINGSJS'\n" | tee -a $TEST5OUTPUT
 printf "\--- End --- \n" | tee -a $TEST5OUTPUT
-printf "DEPLOYMENTDATA    = '$DEPLOYMENTDATA'\n" | tee -a $TEST5OUTPUT
-printf "TEST5OUTPUT       = '$TEST5OUTPUT'\n" | tee -a $TEST5OUTPUT
-printf "TEST5RESULTS      = '$TEST5RESULTS'\n" | tee -a $TEST5OUTPUT
-printf "CURRENTTIME       = '$CURRENTTIME' '$CURRENTTIMES'\n" | tee -a $TEST5OUTPUT
-printf "STARTTIME         = '$STARTTIME' '$STARTTIME_S'\n" | tee -a $TEST5OUTPUT
-printf "ENDTIME           = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST5OUTPUT
+printf "DEPLOYMENTDATA       = '$DEPLOYMENTDATA'\n" | tee -a $TEST5OUTPUT
+printf "TEST5OUTPUT          = '$TEST5OUTPUT'\n" | tee -a $TEST5OUTPUT
+printf "TEST5RESULTS         = '$TEST5RESULTS'\n" | tee -a $TEST5OUTPUT
+printf "CURRENTTIME          = '$CURRENTTIME' '$CURRENTTIMES'\n" | tee -a $TEST5OUTPUT
+printf "STARTTIME            = '$STARTTIME' '$STARTTIME_S'\n" | tee -a $TEST5OUTPUT
+printf "ENDTIME              = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST5OUTPUT
 
 # Make copy of SOL file and modify start and end times ---
 `cp $TOKENCONTRACTSDIR/$CONTROLLERSOL .`
@@ -96,10 +98,12 @@ printf "ENDTIME           = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST5OUTPUT
 `cp $TOKENCONTRACTSDIR/SafeMath.sol .`
 `cp $TOKENCONTRACTSDIR/TokenReceivable.sol .`
 `cp $TRSCONTRACTSDIR/$SAVINGSSOL .`
+`cp $STANDARDCONTRACTSDIR/Owned.sol StandardOwned.sol`
 
 # --- Modify dates ---
 `perl -pi -e "s/SOFTCAP_TIME \= 4 hours;/SOFTCAP_TIME \= 33 seconds;/" $SALESOL`
 `perl -pi -e "s/intervalSecs \= 30 days;/intervalSecs \= 30 seconds;/" $SAVINGSSOL`
+`perl -pi -e "s/\.\.\/\.\.\/standard\/contracts\/Owned.sol/StandardOwned.sol/" $SAVINGSSOL`
 #`perl -pi -e "s/ENDDATE \= STARTDATE \+ 28 days;.*$/ENDDATE \= STARTDATE \+ 5 minutes;/" $DAOCASINOTOKENTEMPSOL`
 #`perl -pi -e "s/CAP \= 84417 ether;.*$/CAP \= 100 ether;/" $DAOCASINOTOKENTEMPSOL`
 
@@ -326,7 +330,7 @@ var setupSavingsMessage = "Setup Savings";
 // -----------------------------------------------------------------------------
 console.log("RESULT: " + setupSavingsMessage);
 var setupSavings1Tx = savings.setToken(tokenAddress, {from: contractOwnerAccount, gas: 100000});
-var setupSavings2Tx = savings.init(12, {from: contractOwnerAccount, gas: 100000});
+var setupSavings2Tx = savings.init(12, 4, {from: contractOwnerAccount, gas: 100000});
 
 while (txpool.status.pending > 0) {
 }
@@ -337,7 +341,7 @@ printTxData("setupSavings2Tx", setupSavings2Tx);
 printBalances();
 failIfGasEqualsGasUsed(mint1Tx, mintMessage + " - ac3 + ac4 11111111.11111111 tokens");
 failIfGasEqualsGasUsed(setupSavings1Tx, setupSavingsMessage + " - setToken(...)");
-failIfGasEqualsGasUsed(setupSavings2Tx, setupSavingsMessage + " - init(12)");
+failIfGasEqualsGasUsed(setupSavings2Tx, setupSavingsMessage + " - init(12, 4)");
 
 printControllerContractDetails();
 printLedgerContractDetails();
@@ -376,12 +380,15 @@ console.log("RESULT: ");
 var depositIntoSavingsMessage = "Deposit Into Savings";
 // -----------------------------------------------------------------------------
 console.log("RESULT: " + depositIntoSavingsMessage);
-var depositIntoSavings1Tx = token.approve(savingsAddress, "1000000000000", {from: account3, gas: 200000});
-var depositIntoSavings2Tx = token.approve(savingsAddress, "1000000000000", {from: account4, gas: 200000});
+var depositIntoSavings1Tx = token.transfer(contractOwnerAccount, "1000000000000", {from: account3, gas: 200000});
+var depositIntoSavings2Tx = token.transfer(contractOwnerAccount, "1000000000000", {from: account4, gas: 200000});
 while (txpool.status.pending > 0) {
 }
-var depositIntoSavings3Tx = savings.deposit("1000000000000", {from: account3, gas: 200000});
-var depositIntoSavings4Tx = savings.deposit("1000000000000", {from: account4, gas: 200000});
+var depositIntoSavings3Tx = token.approve(savingsAddress, "2000000000000", {from: contractOwnerAccount, gas: 200000});
+while (txpool.status.pending > 0) {
+}
+var depositIntoSavings4Tx = savings.depositTo(account3, "1000000000000", {from: contractOwnerAccount, gas: 200000});
+var depositIntoSavings5Tx = savings.depositTo(account4, "1000000000000", {from: contractOwnerAccount, gas: 200000});
 var transferIntoSavings1Tx = token.transfer(savingsAddress, "100000000000", {from: multisig, gas: 100000});
 while (txpool.status.pending > 0) {
 }
@@ -389,12 +396,14 @@ printTxData("depositIntoSavings1Tx", depositIntoSavings1Tx);
 printTxData("depositIntoSavings2Tx", depositIntoSavings2Tx);
 printTxData("depositIntoSavings3Tx", depositIntoSavings3Tx);
 printTxData("depositIntoSavings4Tx", depositIntoSavings4Tx);
+printTxData("depositIntoSavings5Tx", depositIntoSavings5Tx);
 printTxData("transferIntoSavings1Tx", transferIntoSavings1Tx);
 printBalances();
-failIfGasEqualsGasUsed(depositIntoSavings1Tx, depositIntoSavingsMessage + " - approve 10,000 tokens ac3 -> deposit");
-failIfGasEqualsGasUsed(depositIntoSavings2Tx, depositIntoSavingsMessage + " - approve 10,000 tokens ac4 -> deposit");
-failIfGasEqualsGasUsed(depositIntoSavings3Tx, depositIntoSavingsMessage + " - deposit 10,000 token ac3");
-failIfGasEqualsGasUsed(depositIntoSavings4Tx, depositIntoSavingsMessage + " - deposit 10,000 token ac4");
+failIfGasEqualsGasUsed(depositIntoSavings1Tx, depositIntoSavingsMessage + " - transfer 10,000 tokens ac3 -> ac1");
+failIfGasEqualsGasUsed(depositIntoSavings2Tx, depositIntoSavingsMessage + " - transfer 10,000 tokens ac4 -> ac1");
+failIfGasEqualsGasUsed(depositIntoSavings3Tx, depositIntoSavingsMessage + " - approve 20,000 tokens ac1 -> deposit");
+failIfGasEqualsGasUsed(depositIntoSavings4Tx, depositIntoSavingsMessage + " - deposit 10,000 tokens ac1 on behalf of ac3");
+failIfGasEqualsGasUsed(depositIntoSavings5Tx, depositIntoSavingsMessage + " - deposit 10,000 tokens ac1 on behalf of ac4");
 failIfGasEqualsGasUsed(transferIntoSavings1Tx, depositIntoSavingsMessage + " - multisig transfer 1,000 token -> deposit");
 printControllerContractDetails();
 printLedgerContractDetails();
@@ -432,7 +441,7 @@ var today = startTime;
 for (var i = today; i < parseInt(today) + 30 * 15; i = parseInt(i) + 30) {
     var timeDate = new Date(i * 1000);
     console.log("RESULT: " + i + " " + timeDate.toUTCString() + " " + savings.periodAt(i) + ", " + 
-    savings.availableForWithdrawalAt(i) + ", " + savings._withdrawTo("1000000000000", "0", i));
+    savings.availableForWithdrawalAt(i) + ", " + savings._withdrawTo("1000000000000", "0", i, savings.total()));
     console.log("RESULT: Waiting until time at " + i + " " + timeDate + " currentDate=" + new Date());
     while ((new Date()).getTime() <= timeDate.getTime()) {
     }

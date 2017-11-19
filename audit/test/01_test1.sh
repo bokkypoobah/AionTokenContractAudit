@@ -13,6 +13,7 @@ PASSWORD=`grep ^PASSWORD= settings.txt | sed "s/^.*=//"`
 TOKENCONTRACTSDIR=`grep ^TOKENCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 SALESCONTRACTSDIR=`grep ^SALESCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 TRSCONTRACTSDIR=`grep ^TRSCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
+STANDARDCONTRACTSDIR=`grep ^STANDARDCONTRACTSDIR= settings.txt | sed "s/^.*=//"`
 
 # --- Tokens ---
 CONTROLLERSOL=`grep ^CONTROLLERSOL= settings.txt | sed "s/^.*=//"`
@@ -54,34 +55,35 @@ STARTTIME_S=`date -r $STARTTIME -u`
 ENDTIME=`echo "$CURRENTTIME+60*5" | bc`
 ENDTIME_S=`date -r $ENDTIME -u`
 
-printf "MODE              = '$MODE'\n" | tee $TEST1OUTPUT
-printf "GETHATTACHPOINT   = '$GETHATTACHPOINT'\n" | tee -a $TEST1OUTPUT
-printf "PASSWORD          = '$PASSWORD'\n" | tee -a $TEST1OUTPUT
-printf "TOKENCONTRACTSDIR = '$TOKENCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
-printf "SALESCONTRACTSDIR = '$SALESCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
-printf "TRSCONTRACTSDIR   = '$TRSCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
+printf "MODE                 = '$MODE'\n" | tee $TEST1OUTPUT
+printf "GETHATTACHPOINT      = '$GETHATTACHPOINT'\n" | tee -a $TEST1OUTPUT
+printf "PASSWORD             = '$PASSWORD'\n" | tee -a $TEST1OUTPUT
+printf "TOKENCONTRACTSDIR    = '$TOKENCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
+printf "SALESCONTRACTSDIR    = '$SALESCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
+printf "TRSCONTRACTSDIR      = '$TRSCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
+printf "STANDARDCONTRACTSDIR = '$STANDARDCONTRACTSDIR'\n" | tee -a $TEST1OUTPUT
 printf "\--- Token --- \n" | tee -a $TEST1OUTPUT
-printf "CONTROLLERSOL     = '$CONTROLLERSOL'\n" | tee -a $TEST1OUTPUT
-printf "CONTROLLERJS      = '$CONTROLLERJS'\n" | tee -a $TEST1OUTPUT
-printf "LEDGERSOL         = '$LEDGERSOL'\n" | tee -a $TEST1OUTPUT
-printf "LEDGERJS          = '$LEDGERJS'\n" | tee -a $TEST1OUTPUT
-printf "TOKENSOL          = '$TOKENSOL'\n" | tee -a $TEST1OUTPUT
-printf "TOKENJS           = '$TOKENJS'\n" | tee -a $TEST1OUTPUT
+printf "CONTROLLERSOL        = '$CONTROLLERSOL'\n" | tee -a $TEST1OUTPUT
+printf "CONTROLLERJS         = '$CONTROLLERJS'\n" | tee -a $TEST1OUTPUT
+printf "LEDGERSOL            = '$LEDGERSOL'\n" | tee -a $TEST1OUTPUT
+printf "LEDGERJS             = '$LEDGERJS'\n" | tee -a $TEST1OUTPUT
+printf "TOKENSOL             = '$TOKENSOL'\n" | tee -a $TEST1OUTPUT
+printf "TOKENJS              = '$TOKENJS'\n" | tee -a $TEST1OUTPUT
 printf "\--- Sales --- \n" | tee -a $TEST1OUTPUT
-printf "RECEIVERSOL       = '$RECEIVERSOL'\n" | tee -a $TEST1OUTPUT
-printf "RECEIVERJS        = '$RECEIVERJS'\n" | tee -a $TEST1OUTPUT
-printf "SALESOL           = '$SALESOL'\n" | tee -a $TEST1OUTPUT
-printf "SALEJS            = '$SALEJS'\n" | tee -a $TEST1OUTPUT
+printf "RECEIVERSOL          = '$RECEIVERSOL'\n" | tee -a $TEST1OUTPUT
+printf "RECEIVERJS           = '$RECEIVERJS'\n" | tee -a $TEST1OUTPUT
+printf "SALESOL              = '$SALESOL'\n" | tee -a $TEST1OUTPUT
+printf "SALEJS               = '$SALEJS'\n" | tee -a $TEST1OUTPUT
 printf "\--- Trs --- \n" | tee -a $TEST1OUTPUT
-printf "SAVINGSSOL        = '$SAVINGSSOL'\n" | tee -a $TEST1OUTPUT
-printf "SAVINGSJS         = '$SAVINGSJS'\n" | tee -a $TEST1OUTPUT
+printf "SAVINGSSOL           = '$SAVINGSSOL'\n" | tee -a $TEST1OUTPUT
+printf "SAVINGSJS            = '$SAVINGSJS'\n" | tee -a $TEST1OUTPUT
 printf "\--- End --- \n" | tee -a $TEST1OUTPUT
-printf "DEPLOYMENTDATA    = '$DEPLOYMENTDATA'\n" | tee -a $TEST1OUTPUT
-printf "TEST1OUTPUT       = '$TEST1OUTPUT'\n" | tee -a $TEST1OUTPUT
-printf "TEST1RESULTS      = '$TEST1RESULTS'\n" | tee -a $TEST1OUTPUT
-printf "CURRENTTIME       = '$CURRENTTIME' '$CURRENTTIMES'\n" | tee -a $TEST1OUTPUT
-printf "STARTTIME         = '$STARTTIME' '$STARTTIME_S'\n" | tee -a $TEST1OUTPUT
-printf "ENDTIME           = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST1OUTPUT
+printf "DEPLOYMENTDATA       = '$DEPLOYMENTDATA'\n" | tee -a $TEST1OUTPUT
+printf "TEST1OUTPUT          = '$TEST1OUTPUT'\n" | tee -a $TEST1OUTPUT
+printf "TEST1RESULTS         = '$TEST1RESULTS'\n" | tee -a $TEST1OUTPUT
+printf "CURRENTTIME          = '$CURRENTTIME' '$CURRENTTIMES'\n" | tee -a $TEST1OUTPUT
+printf "STARTTIME            = '$STARTTIME' '$STARTTIME_S'\n" | tee -a $TEST1OUTPUT
+printf "ENDTIME              = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST1OUTPUT
 
 # Make copy of SOL file and modify start and end times ---
 `cp $TOKENCONTRACTSDIR/$CONTROLLERSOL .`
@@ -98,9 +100,11 @@ printf "ENDTIME           = '$ENDTIME' '$ENDTIME_S'\n" | tee -a $TEST1OUTPUT
 `cp $SALESCONTRACTSDIR/$RECEIVERSOL .`
 `cp $SALESCONTRACTSDIR/$SALESOL .`
 `cp $TRSCONTRACTSDIR/$SAVINGSSOL .`
+`cp $STANDARDCONTRACTSDIR/Owned.sol StandardOwned.sol`
 
 # --- Modify dates ---
 `perl -pi -e "s/SOFTCAP_TIME \= 4 hours;/SOFTCAP_TIME \= 33 seconds;/" $SALESOL`
+`perl -pi -e "s/\.\.\/\.\.\/standard\/contracts\/Owned.sol/StandardOwned.sol/" $SAVINGSSOL`
 #`perl -pi -e "s/ENDDATE \= STARTDATE \+ 28 days;.*$/ENDDATE \= STARTDATE \+ 5 minutes;/" $DAOCASINOTOKENTEMPSOL`
 #`perl -pi -e "s/CAP \= 84417 ether;.*$/CAP \= 100 ether;/" $DAOCASINOTOKENTEMPSOL`
 

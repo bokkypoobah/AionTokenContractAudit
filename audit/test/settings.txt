@@ -4,6 +4,7 @@ PASSWORD=testtest
 TOKENCONTRACTSDIR=../../token/contracts
 SALESCONTRACTSDIR=../../sales/contracts
 TRSCONTRACTSDIR=../../trs/contracts
+STANDARDCONTRACTSDIR=../../standard/contracts
 
 # --- Tokens ---
 CONTROLLERSOL=Controller.sol
